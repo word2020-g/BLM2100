@@ -1,0 +1,136 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: μVision V5.18a
+Copyright (C) 2016 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: 1 1, 1, LIC=9WSKC-7WJZT-CXXU6-DKBZU-CPL1U-W9Z4N
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Standard  Version: 5.18a
+Toolchain Path:  D:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 1 (build 61)
+Assembler:       Armasm.exe V5.06 update 1 (build 61)
+Linker/Locator:  ArmLink.exe V5.06 update 1 (build 61)
+Library Manager: ArmAr.exe V5.06 update 1 (build 61)
+Hex Converter:   FromElf.exe V5.06 update 1 (build 61)
+CPU DLL:         
+Dialog DLL:      
+Target DLL:      Segger\JL2CM3.dll V2.99.19.0
+Dialog DLL:      TCM.DLL V1.14.8.0
+ 
+<h2>Project:</h2>
+E:\数据透传代码仓库\nrf52832\examples\ble_peripheral\ble_app_uart\pca10040\s132\arm5_no_packs\ble_app_uart_pca10040_s132.uvprojx
+Project File Date:  02/15/2023
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 1 (build 61)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'flash_s132_nrf52_7.2.0_softdevice'
+Before Build - User command #1: attrib +R ..\..\..\..\..\..\components\softdevice\s132\hex\\*
+compiling app_config.c...
+..\..\..\my_drives\app_config.h(4): error:  #5: cannot open source input file "nrf_uarte.h": No such file or directory
+  #include "nrf_uarte.h"
+..\..\..\my_drives\app_config.c: 0 warnings, 1 error
+compiling flash.c...
+..\..\..\my_drives\flash.h(4): error:  #5: cannot open source input file "fds.h": No such file or directory
+  #include "fds.h"
+..\..\..\my_drives\flash.c: 0 warnings, 1 error
+compiling cmd.c...
+..\..\..\my_drives\cmd.h(3): error:  #5: cannot open source input file "nrf_error.h": No such file or directory
+  #include "nrf_error.h"
+..\..\..\my_drives\cmd.c: 0 warnings, 1 error
+compiling main.c...
+..\..\..\main.c(54): error:  #5: cannot open source input file "nordic_common.h": No such file or directory
+  #include "nordic_common.h"
+..\..\..\main.c: 0 warnings, 1 error
+compiling data_format.c...
+..\..\..\my_drives\data_format.c(2): error:  #5: cannot open source input file "nrf_log.h": No such file or directory
+  #include "nrf_log.h"
+..\..\..\my_drives\data_format.c: 0 warnings, 1 error
+compiling ble_db_discovery.c...
+..\..\..\..\..\..\components\ble\ble_db_discovery\ble_db_discovery.c(41): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\ble\ble_db_discovery\ble_db_discovery.c: 0 warnings, 1 error
+compiling nrf_ble_gq.c...
+..\..\..\..\..\..\components\ble\nrf_ble_gq\nrf_ble_gq.c(41): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\ble\nrf_ble_gq\nrf_ble_gq.c: 0 warnings, 1 error
+compiling nrf_ble_scan.c...
+..\..\..\..\..\..\components\ble\nrf_ble_scan\nrf_ble_scan.c(41): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\ble\nrf_ble_scan\nrf_ble_scan.c: 0 warnings, 1 error
+compiling nrfx_ppi.c...
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_ppi.c(41): error:  #5: cannot open source input file "nrfx.h": No such file or directory
+  #include <nrfx.h>
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_ppi.c: 0 warnings, 1 error
+compiling ble_nus_c.c...
+..\..\..\..\..\..\components\ble\ble_services\ble_nus_c\ble_nus_c.c(41): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\ble\ble_services\ble_nus_c\ble_nus_c.c: 0 warnings, 1 error
+compiling nrfx_rtc.c...
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_rtc.c(41): error:  #5: cannot open source input file "nrfx.h": No such file or directory
+  #include <nrfx.h>
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_rtc.c: 0 warnings, 1 error
+compiling nrfx_timer.c...
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_timer.c(41): error:  #5: cannot open source input file "nrfx.h": No such file or directory
+  #include <nrfx.h>
+..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_timer.c: 0 warnings, 1 error
+compiling nrf_libuarte_drv.c...
+..\..\..\..\..\..\components\libraries\libuarte\nrf_libuarte_drv.h(43): error:  #5: cannot open source input file "sdk_errors.h": No such file or directory
+  #include "sdk_errors.h"
+..\..\..\..\..\..\components\libraries\libuarte\nrf_libuarte_drv.c: 0 warnings, 1 error
+compiling nrf_libuarte_async.c...
+..\..\..\..\..\..\components\libraries\libuarte\nrf_libuarte_async.h(43): error:  #5: cannot open source input file "sdk_errors.h": No such file or directory
+  #include "sdk_errors.h"
+..\..\..\..\..\..\components\libraries\libuarte\nrf_libuarte_async.c: 0 warnings, 1 error
+compiling nrf_queue.c...
+..\..\..\..\..\..\components\libraries\queue\nrf_queue.c(40): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\libraries\queue\nrf_queue.c: 0 warnings, 1 error
+compiling fds.c...
+..\..\..\..\..\..\components\libraries\fds\fds.c(40): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\libraries\fds\fds.c: 0 warnings, 1 error
+compiling nrf_fstorage_sd.c...
+..\..\..\..\..\..\components\libraries\fstorage\nrf_fstorage_sd.c(41): error:  #5: cannot open source input file "sdk_common.h": No such file or directory
+  #include "sdk_common.h"
+..\..\..\..\..\..\components\libraries\fstorage\nrf_fstorage_sd.c: 0 warnings, 1 error
+compiling nrf_fstorage.c...
+..\..\..\..\..\..\components\libraries\fstorage\nrf_fstorage.h(61): error:  #5: cannot open source input file "sdk_errors.h": No such file or directory
+  #include "sdk_errors.h"
+..\..\..\..\..\..\components\libraries\fstorage\nrf_fstorage.c: 0 warnings, 1 error
+"..\..\..\..\..\..\components\softdevice\s132\hex\s132_nrf52_7.2.0_softdevice.hex" - 18 Error(s), 0 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.6.0.pack
+                ARM::CMSIS:CORE:5.3.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.3.0
+
+Package Vendor: NordicSemiconductor
+                http://developer.nordicsemi.com/nRF5_SDK/pieces/nRF_DeviceFamilyPack/NordicSemiconductor.nRF_DeviceFamilyPack.8.46.0.pack
+                NordicSemiconductor::Device:Startup:8.47.0
+                Nordic Semiconductor nRF ARM devices Device Family Pack with BSD license.
+   * Component: Startup Version: 8.47.0
+
+<h2>Collection of Component include folders:</h2>
+  E:\数据透传代码仓库\nrf52832\examples\ble_peripheral\ble_app_uart\pca10040\s132\arm5_no_packs\RTE
+  D:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.46.0\Device\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.3.0
+
+   * Component: NordicSemiconductor::Device:Startup:8.47.0
+      Source file:   Device\Source\system_nrf52.c
+      Include file:  Device\Include\system_nrf52.h
+      Source file:   Device\Source\arm\arm_startup_nrf52.s
+      Include file:  Device\Include\system_nrf.h
+Target not created.
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>

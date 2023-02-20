@@ -1,0 +1,6 @@
+--c99 -c --cpu Cortex-M4.fp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ..\..\..\config -I ..\config --reduce_paths
+-I E:\数据透传代码仓库\nrf52832\examples\ble_peripheral\ble_app_uart\pca10040\s132\arm5_no_packs\RTE
+-I D:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.46.0\Device\Include
+-I D:\Keil_v5\ARM\CMSIS\Include
+-D__UVISION_VERSION="518" -D_RTE_ -DNRF52832_XXAA -D__HEAP_SIZE="8192" -D__STACK_SIZE="8192"
+-o ..\..\..\..\..\..\components\softdevice\s132\hex\nrf_ble_gq.o --omf_browse ..\..\..\..\..\..\components\softdevice\s132\hex\nrf_ble_gq.crf --depend ..\..\..\..\..\..\components\softdevice\s132\hex\nrf_ble_gq.d "..\..\..\..\..\..\components\ble\nrf_ble_gq\nrf_ble_gq.c"
