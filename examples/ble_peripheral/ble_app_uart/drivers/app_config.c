@@ -1,6 +1,6 @@
 #include "app_config.h"
-
-#define CONFIG_FLASH_ID    0x0A00
+#include "flash.h"
+#define CONFIG_FLASH_ID    0x0100
 #define CONFIG_FLASH_KEY   0x0100
 
 static config_t config =

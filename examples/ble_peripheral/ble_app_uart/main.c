@@ -76,6 +76,8 @@
 #include "nrf_libuarte_async.h"
 #include "nrf_queue.h"
 #include "nrf_drv_clock.h"
+#include "nrf_fstorage.h"
+#include "cmd.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -139,7 +141,7 @@ typedef struct
 NRF_QUEUE_DEF(buffer_t, uart_rxd_queue, 40, NRF_QUEUE_MODE_OVERFLOW);
 NRF_QUEUE_DEF(buffer_t, nus_rxd_queue, 40, NRF_QUEUE_MODE_OVERFLOW);
 
-static volatile bool m_loopback_phase;	/**< libuarte tx ¿ÕÏÐ±êÖ¾Î» */
+static volatile bool m_loopback_phase;	/**< libuarte tx free */
 
 /**@brief   Macro for defining a uart instance.*/
 static struct 
@@ -954,21 +956,48 @@ static void adv_scan_start(void)
 {
     ret_code_t err_code;
 
-/*    //check if there are no flash operations in progress
+    //check if there are no flash operations in progress
     if (!nrf_fstorage_is_busy(NULL))
     {
+	#if ROLE
+		// Start scan.
+		scan_start();
+	#else
+		// Start advertising.
+		err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+		APP_ERROR_CHECK(err_code);
+	#endif		
     }
-*/
-#if ROLE
-	// Start scan.
-	scan_start();
-#else
-	// Start advertising.
-	err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-	APP_ERROR_CHECK(err_code);
-#endif
 }
 
+void cmd_event_handler(cmd_evt_t *p_evt)
+{
+	ret_code_t ret;
+	switch ( p_evt->event )
+	{
+		case APP_AT_ECHO:
+			break;
+		case APP_AT_EXIT:		
+			break;
+        case APP_ADV_MODE:
+            break;
+        case APP_STOP_SCAN:
+            break;	
+        case APP_START_SCAN:
+            break;
+		case APP_DISCONNECT:        
+			break;
+		case APP_SLEEP:
+			break;			
+		default:
+			break;
+	}
+}
+
+static void cmd_init(void)
+{
+    cmd_parser_init(cmd_event_handler);
+}
 
 void send(void)
 {
@@ -1009,6 +1038,7 @@ int main(void)
     log_init();
 	libuarte_init();
     timers_init();
+	cmd_init();
 
     power_management_init();
     ble_stack_init();
