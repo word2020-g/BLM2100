@@ -40,6 +40,16 @@ static config_t config =
 	.adv_tx_power		= 0
 };
 
+/**@brief   Function for initializing the config Module.
+ *
+ * @details Get data from flash to fill the config.
+ *
+ */
+void app_config_init(void)
+{
+	;
+}
+
 /**
  * @}
  */

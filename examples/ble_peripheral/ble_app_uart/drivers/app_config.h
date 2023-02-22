@@ -63,4 +63,6 @@ typedef struct
 	
 }config_t;
 
+void app_config_init(void);
+
 #endif
