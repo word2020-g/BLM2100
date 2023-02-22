@@ -85,7 +85,7 @@
 
 #define APP_BLE_CONN_CFG_TAG            1                                           /**< A tag identifying the SoftDevice BLE configuration. */
 
-#define DEVICE_NAME                     "Nordic_git"                               /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "aaaaaa"                               /**< Name of device. Will be included in the advertising data. */
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
 #define APP_BLE_OBSERVER_PRIO           3                                           /**< Application's BLE observer priority. You shouldn't need to modify this value. */
@@ -133,7 +133,7 @@ typedef struct
    uint8_t  *ptr; 
    uint16_t len;
 }buffer_t;
-
+//uint8_array_t；
 /**@brief   Create a queue instance.
  */
 NRF_QUEUE_DEF(buffer_t, uart_rxd_queue, 40, NRF_QUEUE_MODE_OVERFLOW);
@@ -780,9 +780,6 @@ static void scan_start(void)
 
     ret = nrf_ble_scan_start(&m_scan);
     APP_ERROR_CHECK(ret);
-
-    ret = bsp_indication_set(BSP_INDICATE_SCANNING);
-    APP_ERROR_CHECK(ret);
 }
 
 /**@brief Function for handling the Nordic UART Service Client errors.
@@ -889,6 +886,13 @@ static void scan_evt_handler(scan_evt_t const * p_scan_evt)
     }
 }
 
+/**@brief NUS UUID. */
+static ble_uuid_t const m_nus_uuid =
+{
+    .uuid = BLE_UUID_NUS_SERVICE,
+    .type = NUS_SERVICE_UUID_TYPE
+};
+
 /**@brief Function for initializing the scanning and setting the filters.
  */
 static void scan_init(void)
@@ -898,10 +902,16 @@ static void scan_init(void)
 
     memset(&init_scan, 0, sizeof(init_scan));
 
-    init_scan.connect_if_match = false;
+    init_scan.connect_if_match = true;
     init_scan.conn_cfg_tag     = APP_BLE_CONN_CFG_TAG;
-	
+
     err_code = nrf_ble_scan_init(&m_scan, &init_scan, scan_evt_handler);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = nrf_ble_scan_filter_set(&m_scan, SCAN_UUID_FILTER, &m_nus_uuid);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = nrf_ble_scan_filters_enable(&m_scan, NRF_BLE_SCAN_UUID_FILTER, false);
     APP_ERROR_CHECK(err_code);
 }
 
