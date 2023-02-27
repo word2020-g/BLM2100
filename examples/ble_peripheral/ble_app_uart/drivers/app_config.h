@@ -9,6 +9,13 @@
 
 typedef struct
 {
+	uint16_t 	file_id;           //!< The ID of the file that the record belongs to.
+    uint16_t 	key;               //!< The record key.	
+	bool 		flag;
+}restore_t;
+
+typedef struct
+{
 	uint8_t addr[MAC_ADDR_LEN];
 	uint8_t empty;
 	uint8_t handle;
@@ -31,7 +38,7 @@ typedef struct
 	uint16_t    uuid16;									//!< 16-bit UUID value or octets 12-13 of 128-bit UUID.*/
 	uint16_t    rx_uuid;								//!< Characteristic UUID (16 bits UUIDs).*/
 	uint16_t    tx_uuid;								//!< Characteristic UUID (16 bits UUIDs). */
-	uint16_t    scan_interval;               			//!< Scan interval in 625 us units. @sa BLE_GAP_SCAN_INTERVALS. */
+	uint16_t    scan_interval;               			//!< Scan interval in 625 us units. @sa BLE_GAP_SCAN_INTERVALS. 0x0004-0xFFFF,4-65535*/
 	uint16_t    scan_window;                      		//!< Scan window in 625 us units. @sa BLE_GAP_SCAN_WINDOW. */
 	uint16_t    scan_timeout;                    		//!< Scan timeout in 10 ms units. @sa BLE_GAP_SCAN_TIMEOUT. */
 	uint16_t 	filt_companyid;
@@ -60,9 +67,11 @@ typedef struct
 	b_addr_t  	b_addr[4];								//!< Binding address
 
 	int8_t 	   	adv_tx_power;							//!< tx_power Radio transmit power in dBm. */
-	
+
 }config_t;
 
+config_t* get_config(void);
+restore_t* get_restore(void);
 void app_config_init(void);
 
 #endif

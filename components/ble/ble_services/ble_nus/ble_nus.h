@@ -94,7 +94,7 @@ extern "C" {
                          ble_nus_on_ble_evt,                      \
                          &_name)
 
-#define BLE_UUID_NUS_SERVICE 0x0001 /**< The UUID of the Nordic UART Service. */
+#define BLE_UUID_NUS_SERVICE 0x0002 /**< The UUID of the Nordic UART Service. */
 
 #define OPCODE_LENGTH        1
 #define HANDLE_LENGTH        2

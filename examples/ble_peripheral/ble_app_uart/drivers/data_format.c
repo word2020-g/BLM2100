@@ -58,7 +58,7 @@ bool StrToHexArray(const uint8_t *p_src,uint8_t *p_dest,uint16_t len)
 		src=p_src[i];
 		if((src>='0'&&src<='9') || (src>='A'&&src<='F') || (src>='a'&&src<='f'))
 		{
-			sscanf((char*)&src,"%x",&dest);
+			sscanf((char*)&src,"%4x",&dest);
 			p_dest[i]=dest;
 			src=0;
 			dest=0;
@@ -96,24 +96,21 @@ bool StrToU8_Hex(const uint8_t *p_src,uint8_t *p_dest,uint16_t len)
 	else return false;
 }
 
-bool StrToU8_Hex_Lsb(const uint8_t *p_src,uint8_t *p_dest,uint16_t len)
+bool StrToU8_Hex_Lsb(uint8_t *p_src,uint8_t *p_dest,uint16_t len)
 {
-	uint8_t src_hex[len];
-	uint32_t data;
+	uint32_t val=0;
 	
-	memset(p_dest,'\0',sizeof(p_dest));
-	if(StrToHexArray(p_src,src_hex,len))
+	for(int i=0;i<len/2;i++)
 	{
-		for(int i=0;i<len;i+=2)
+		if(sscanf((char*)(p_src+2*i),"%2x",&val))
 		{
-			data=src_hex[i]<<4;
-			data=data|src_hex[i+1];
-			p_dest[(len/2)-(i/2)-1]=(uint8_t)data;
+			*(p_dest+i)=val;
+			val=0;
 		}
-		return true;		
+		else
+			return false;		
 	}
-	else
-		return false;
+	return true;	
 }
 
 void hex_to_char_msb(char *p_dest,uint8_t *p_src,uint16_t data_len)

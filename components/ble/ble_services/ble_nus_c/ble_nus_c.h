@@ -102,7 +102,7 @@ NRF_SDH_BLE_OBSERVERS(_name ## _obs,                     \
 
 #define NUS_BASE_UUID                   {{0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E}} /**< Used vendor-specific UUID. */
 
-#define BLE_UUID_NUS_SERVICE            0x0001                      /**< The UUID of the Nordic UART Service. */
+#define BLE_UUID_NUS_SERVICE            0x0001                     /**< The UUID of the Nordic UART Service. */
 #define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0002                      /**< The UUID of the RX Characteristic. */
 #define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0003                      /**< The UUID of the TX Characteristic. */
 

@@ -52,10 +52,12 @@
 #include "sdk_macros.h"
 #include "ble_advdata.h"
 
+#include "app_config.h"
+
 #define NRF_LOG_MODULE_NAME ble_scan
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
-
+static config_t* p_config;
 
 /**@brief Function for establishing the connection with a device.
  *
@@ -922,10 +924,12 @@ static void nrf_ble_scan_on_adv_report(nrf_ble_scan_t           const * const p_
     {
         scan_evt.scan_evt_id = NRF_BLE_SCAN_EVT_FILTER_MATCH;
         nrf_ble_scan_connect_with_target(p_scan_ctx, p_adv_report);
+		NRF_LOG_INFO("NRF_BLE_SCAN_EVT_FILTER_MATCH 3") 
     }
     // In the normal filter mode, only one filter match is needed to generate the notification to the main application.
     else if ((!all_filter_mode) && is_filter_matched)
     {
+		NRF_LOG_INFO("NRF_BLE_SCAN_EVT_FILTER_MATCH 1")
         scan_evt.scan_evt_id = NRF_BLE_SCAN_EVT_FILTER_MATCH;
         nrf_ble_scan_connect_with_target(p_scan_ctx, p_adv_report);
     }
@@ -1048,7 +1052,7 @@ ret_code_t nrf_ble_scan_init(nrf_ble_scan_t            * const p_scan_ctx,
     VERIFY_PARAM_NOT_NULL(p_scan_ctx);
 
     p_scan_ctx->evt_handler = evt_handler;
-
+	p_config = get_config();
 #if (NRF_BLE_SCAN_FILTER_ENABLE == 1)
     // Disable all scanning filters.
     memset(&p_scan_ctx->scan_filters, 0, sizeof(p_scan_ctx->scan_filters));
@@ -1095,7 +1099,6 @@ ret_code_t nrf_ble_scan_init(nrf_ble_scan_t            * const p_scan_ctx,
 
     return NRF_SUCCESS;
 }
-
 
 ret_code_t nrf_ble_scan_start(nrf_ble_scan_t const * const p_scan_ctx)
 {
@@ -1193,17 +1196,207 @@ ret_code_t nrf_ble_scan_copy_addr_to_sd_gap_addr(ble_gap_addr_t * p_gap_addr,
     return NRF_SUCCESS;
 }
 
+static uint32_t adv_report_parse(uint8_t type, ble_data_t *p_advdata, ble_data_t *p_typeadta)
+{
+    uint32_t index = 0;
+    uint8_t *p_data;
+
+    p_data = p_advdata->p_data;
+
+    while (index < p_advdata->len)                  // 判断当前指针是否还未到包??
+    {
+        uint8_t fieldLength = p_data[index];
+        uint8_t fieldType = p_data[index + 1];
+        if (fieldType == type)                    // 如果找到了adType
+        {
+            p_typeadta->p_data = &p_data[index + 2];  // 数据段内??
+            p_typeadta->len = fieldLength - 1;      // 数据段长??	
+            return NRF_SUCCESS;                     // 找到了adType
+        }
+        index += fieldLength + 1;                   // 没找到adType则指向下一个数据段
+    }
+		
+    return NRF_ERROR_NOT_FOUND;
+}
+
+static bool adv_name_filter(ble_gap_evt_adv_report_t const *const p_adv_report,
+                                                     const   char *adv_name)
+{
+    uint32_t err_code;
+    ble_data_t adv_data;
+    ble_data_t dev_name;
+
+    adv_data.p_data = (uint8_t *)p_adv_report->data.p_data;
+    adv_data.len    = p_adv_report->data.len;
+    err_code = adv_report_parse(BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME,
+                                &adv_data,
+                                &dev_name);
+
+    if (err_code == NRF_SUCCESS)
+    {
+        if (memcmp(adv_name, dev_name.p_data, dev_name.len) == 0)
+		{
+            return true;
+		}
+    }
+    return false;
+}
+
+static bool adv_companyid_filter(ble_gap_evt_adv_report_t const *const p_adv_report,
+                            const uint16_t adv_companyid)
+{
+    uint32_t err_code;
+    ble_data_t adv_data;
+    ble_data_t dev_companyid;	
+	uint16_t companyid;
+	
+    adv_data.p_data = (uint8_t *)p_adv_report->data.p_data;
+    adv_data.len = p_adv_report->data.len;
+
+    err_code = adv_report_parse(BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA,
+                                &adv_data,
+                                &dev_companyid);
+	companyid = dev_companyid.p_data[0] | dev_companyid.p_data[1] << 8;
+
+    if (err_code == NRF_SUCCESS)
+    {
+        if (companyid == adv_companyid)
+            return true;
+    }
+    return false;
+}
+
+static bool adv_uuid_filter(ble_gap_evt_adv_report_t const *const p_adv_report,
+                            const uint16_t adv_uuid)
+{
+    uint32_t err_code;
+    ble_data_t adv_data;
+    ble_data_t dev_uuid;
+	uint16_t uuid;
+	
+    adv_data.p_data = (uint8_t *)p_adv_report->data.p_data;
+    adv_data.len = p_adv_report->data.len;
+
+    err_code = adv_report_parse(BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE,
+                                &adv_data,
+                                &dev_uuid);
+
+    uuid = dev_uuid.p_data[0] | dev_uuid.p_data[1] << 8;
+    if (err_code == NRF_SUCCESS)
+    {
+        if (uuid == adv_uuid)
+            return true;
+    }
+    return false;
+}
+
+static bool adv_mac_filter(ble_gap_evt_adv_report_t const *const p_adv_report,
+                           uint8_t *p_addr)
+{
+    if (memcmp(p_addr, p_adv_report->peer_addr.addr,
+               sizeof(p_adv_report->peer_addr.addr)) == 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+//nrf_ble_scan_connect_with_target(p_scan_data, p_adv_report);
+void b_mac_connect(nrf_ble_scan_t           const * const p_scan_ctx,
+                   ble_gap_evt_adv_report_t const * const p_adv_report)
+{
+	if(p_config->scan_state==1)
+	{
+		for(int i=0;i<4;i++)
+		{				
+			if(p_config->b_addr[i].empty!=0)
+			{
+				if (adv_mac_filter(p_adv_report,p_config->b_addr[i].addr))
+				{
+					nrf_ble_scan_connect_with_target(p_scan_ctx, p_adv_report);
+					return;
+				} 
+			}
+		}
+	}	    
+}
+
+/**@brief Function for calling the BLE_GAP_EVT_ADV_REPORT event to check whether the received
+ *        scanning data matches the scan configuration.
+ *
+ * @param[in] p_scan_ctx    Pointer to the Scanning Module instance.
+ * @param[in] p_adv_report  Advertising report.
+ */
+static void ble_scan_on_adv_report(nrf_ble_scan_t           const * const p_scan_ctx,
+                                       ble_gap_evt_adv_report_t const * const p_adv_report)
+{
+	if(p_config->scan_state==2)
+	{
+		scan_evt_t scan_evt;
+		memset(&scan_evt, 0, sizeof(scan_evt));
+		scan_evt.p_scan_params = &p_scan_ctx->scan_params;
+		scan_evt.scan_evt_id = NRF_BLE_SCAN_EVT_FILTER_MATCH;
+		scan_evt.params.filter_match.p_adv_report = p_adv_report;
+		p_scan_ctx->evt_handler(&scan_evt); 
+	}	
+}
 
 void nrf_ble_scan_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_contex)
 {
     nrf_ble_scan_t                 * p_scan_data  = (nrf_ble_scan_t *)p_contex;
     ble_gap_evt_adv_report_t const * p_adv_report = &p_ble_evt->evt.gap_evt.params.adv_report;
     ble_gap_evt_t const            * p_gap_evt    = &p_ble_evt->evt.gap_evt;
-
+	
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_ADV_REPORT:
-            nrf_ble_scan_on_adv_report(p_scan_data, p_adv_report);
+            switch (p_config->filt_type)
+            {
+                case 0:
+					ble_scan_on_adv_report(p_scan_data, p_adv_report);
+					b_mac_connect(p_scan_data, p_adv_report);
+                    break;
+					
+                case 1:
+                    if (strlen((char*)p_config->filt_name) != 0)
+                    {			
+                        if (adv_name_filter(p_adv_report, (const char *)p_config->filt_name))
+                        {						
+							ble_scan_on_adv_report(p_scan_data, p_adv_report);
+                            b_mac_connect(p_scan_data, p_adv_report);
+                        }
+                    }
+                    break;
+					
+                case 2:		
+					if (adv_companyid_filter(p_adv_report,p_config->filt_companyid))
+					{
+						ble_scan_on_adv_report(p_scan_data, p_adv_report);
+                        b_mac_connect(p_scan_data, p_adv_report);
+					}					
+                    break;
+					
+                case 3:		
+					if (adv_uuid_filter(p_adv_report,p_config->filt_uuid_16))
+					{
+						ble_scan_on_adv_report(p_scan_data, p_adv_report);
+                        b_mac_connect(p_scan_data, p_adv_report);						
+					}				
+                    break;
+					
+                case 4:		
+					if (adv_mac_filter(p_adv_report,p_config->filt_mac))
+					{
+						ble_scan_on_adv_report(p_scan_data, p_adv_report);
+                        b_mac_connect(p_scan_data, p_adv_report);						
+					}				
+                    break;
+					
+                default:
+                    break;
+            }
+            
+            //nrf_ble_scan_on_adv_report(p_scan_data, p_adv_report);
             break;
 
         case BLE_GAP_EVT_TIMEOUT:
@@ -1217,8 +1410,8 @@ void nrf_ble_scan_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_contex)
         default:
             break;
     }
+    UNUSED_RETURN_VALUE(sd_ble_gap_scan_start(NULL, &p_scan_data->scan_buffer));
 }
-
 
 #endif // NRF_BLE_SCAN_ENABLED
 

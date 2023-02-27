@@ -1,6 +1,10 @@
 #include "flash.h"
+
 #include "nrf_delay.h"
 #include "nrf_log.h"
+
+#define RESTORE_FILE    	0x0100
+#define RESTORE_REC_KEY   	0x0100
 
 static bool volatile m_fds_initialized;
 
@@ -14,7 +18,7 @@ static uint16_t s_currentId;
 
 static void waitForFlashOperationToComplete(void)
 {
-	nrf_delay_ms(10);
+	nrf_delay_ms(20);
 }
 
 static uint32_t flashWriteWithWaiting(fds_record_desc_t *pDesc, fds_record_t *pRec)
@@ -22,6 +26,7 @@ static uint32_t flashWriteWithWaiting(fds_record_desc_t *pDesc, fds_record_t *pR
 	ret_code_t retCode; 
 	
 	retCode = fds_record_write(pDesc, pRec);
+	NRF_LOG_INFO("retCode3 = %x",retCode);
 	waitForFlashOperationToComplete();
 
 	return retCode;
@@ -84,13 +89,13 @@ bool flash_write(uint16_t fileId, uint16_t key, uint8_t *pData, uint32_t dataLen
 	if(retCode == NRF_SUCCESS)			
 	{
 		retCode = flashUpdateWithWaiting(&recordDesc, &record);
-		NRF_LOG_INFO("retCode = %d",retCode);
+		NRF_LOG_INFO("retCode1 = %x",retCode);
 	}
 	else 
 	{
 		flashDelete(&recordDesc);
 		retCode = flashWriteWithWaiting(&recordDesc, &record);
-		NRF_LOG_INFO("retCode = %d",retCode);
+		NRF_LOG_INFO("retCode2 = %x",retCode);
 	}
 	return true;
 }
@@ -120,7 +125,6 @@ ret_code_t flash_read(uint16_t fileId, uint16_t key, uint8_t *pData, uint8_t dat
 	}
 	else return false;
 }
-
 
 void Fds_FlashContrl(uint16_t fileId,uint16_t keyId, uint8_t readWriteFlag, uint8_t *pData, uint32_t dataLen)
 {
@@ -209,5 +213,3 @@ bool flash_fds_init(void)
 	}
 	return false;
 }
-
-

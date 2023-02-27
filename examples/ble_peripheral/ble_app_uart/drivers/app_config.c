@@ -1,7 +1,17 @@
 #include "app_config.h"
 #include "flash.h"
-#define CONFIG_FLASH_ID    0x0100
-#define CONFIG_FLASH_KEY   0x0100
+
+#define RESTORE_FILE    	0x0001
+#define RESTORE_REC_KEY   	0x0001
+#define CONFIG_FLASH_ID    	0x0010
+#define CONFIG_FLASH_KEY   	0x0010
+
+static restore_t restore =
+{
+    .file_id = RESTORE_FILE,
+    .key     = RESTORE_REC_KEY,
+    .flag	 = true,
+};
 
 static config_t config =
 {
@@ -33,7 +43,7 @@ static config_t config =
 	.device_name		= "beelinker",
 	.filt_name			= "beelinker",
 	.filt_mac			= {0x00, 0x00, 0x01, 0x01, 0x23, 0x20},
-	.keys				= "000000",
+	.keys				= "111111",
 	.advdata_manuf_data	= {0x20, 0x23, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 	.m_beacon_info		= {0x02, 0x15, 0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78, 0x89, 0x9a, 0xab, 0xbc, 0xcd, 0xde, 0xef, 0xf0, 0x01, 0x02 , 0x03, 0x04, 0xC3},
 	.b_addr				= {{0x00, 0x00, 0x01, 0x01, 0x23, 0x20}},
@@ -47,7 +57,37 @@ static config_t config =
  */
 void app_config_init(void)
 {
-	;
+    uint32_t err_code;
+	//If flash is empty, write it first
+	err_code = flash_read(restore.file_id, restore.key,(uint8_t *)&restore, sizeof(restore_t));
+    if(err_code == FDS_ERR_NOT_FOUND)
+    {
+		flash_write(restore.file_id, restore.key,(uint8_t *)&restore, sizeof(restore_t));
+		flash_write(config.file_id, config.key,(uint8_t *)&config, sizeof(config));	
+	}
+    else
+    {
+        if(restore.flag)
+        {
+			flash_read(config.file_id, config.key,(uint8_t *)&config, sizeof(config));
+		}
+		else
+		{
+			flash_write(config.file_id, config.key,(uint8_t *)&config, sizeof(config));
+            restore.flag = 1;
+            flash_write(restore.file_id, restore.key,(uint8_t *)&restore, sizeof(restore_t));			
+		}
+	}
+}
+
+restore_t* get_restore(void)
+{
+	return &restore;
+}
+
+config_t* get_config(void)
+{
+	return &config;
 }
 
 /**
